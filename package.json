@@ -1,0 +1,25 @@
+{
+  "name": "tgwk12-lab1",
+  "version": "1.0.0",
+  "description": "Graphic design portfolio, project for fundementals of webdevelopment, jönköpings University 2025",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "WDF-Project-2025"
+  },
+  "keywords": [
+    "Node",
+    "Express",
+    "Handlebars",
+    "SQLite3."
+  ],
+  "author": "Caroline Klasson",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
