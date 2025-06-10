@@ -26,12 +26,6 @@ const ratchildrendata = [
 
 const dbFile = "my-project-data.sqlite3.db";
 const db = new sqlite3.Database(dbFile);
-/* load handlebars package for express */
-const { engine } = require("express-handlebars");
-
-app.engine("handlebars", engine()); // set the view engine to handlebars
-app.set("view engine", "handlebars"); // set the view engine to handlebars
-app.set("views", __dirname + "/views"); // set the views directory
 
 app.get("/", function (req, res) {
   res.render("home");
@@ -52,6 +46,7 @@ app.get("/ratparents", function (req, res) {
 
 app.get("/ratchildren", function (req, res) {
   res.render("ratchildren.handlebars");
+  res.send("Hello filthy Rat!");
 });
 
 app.use(express.static("public"));
@@ -73,10 +68,19 @@ const { initTableratchildren } = require(__dirname + "/data/ratchildrendata");
 //initTableMovies(db);
 
 /*db.run(
+app.get("/cv", function (req, res) {
+  res.sendFile(__dirname + "/views/mycv-01.html");
+});
+
+app.use(express.static("public"));
+app.use(express.static("views"));
+
+db.run(
   `
-  CREATE TABLE ratparentsdata (
+  CREATE TABLE Person (
     pid INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
+    fname TEXT NOT NULL,
+    lname TEXT NOT NULL,
     age INTEGER,
     email TEXT
   )
@@ -89,6 +93,7 @@ const { initTableratchildren } = require(__dirname + "/data/ratchildrendata");
 
       db.run(
         `
+<<<<<<< HEAD
       INSERT INTO ratparentsdata (pid,name, age, email)
       VALUES 
         ('1','Rathew Chedders','34', 'R-Chedders@ratlook.com'),
@@ -97,11 +102,36 @@ const { initTableratchildren } = require(__dirname + "/data/ratchildrendata");
         ('4', 'Rattin Brie', '38', 'BrieBoy@ratlook.com'),
         ('5', 'Ratoline Camamberta', '50','Rat.Cam@ratlook.com')`,
 
+=======
+      INSERT INTO Person (fname, lname, age, email)
+      VALUES 
+        ('John', 'Smith', 25, 'john.smith@example.com'),
+        ('Jane', 'Doe', 30, 'jane.doe@mail.com'),
+        ('Alex', 'Johnson', 40, 'alex.johnson@company.com'),
+        ('Emily', 'Brown', 35, 'emily.brown@business.org'),
+        ('Michael', 'Davis', 50, 'michael.davis@email.net'),
+        ('Sarah', 'Miller', 28, 'sarah.miller@example.com'),
+        ('David', 'Garcia', 45, 'david.garcia@mail.com'),
+        ('Laura', 'Rodriguez', 32, 'laura.rodriguez@company.com'),
+        ('Chris', 'Wilson', 27, 'chris.wilson@business.org'),
+        ('Anna', 'Martinez', 22, 'anna.martinez@email.net'),
+        ('James', 'Taylor', 53, 'james.taylor@example.com'),
+        ('Patricia', 'Anderson', 44, 'patricia.anderson@mail.com'),
+        ('Robert', 'Thomas', 38, 'robert.thomas@company.com'),
+        ('Linda', 'Hernandez', 55, 'linda.hernandez@business.org'),
+        ('William', 'Moore', 26, 'william.moore@email.net'),
+        ('Barbara', 'Jackson', 37, 'barbara.jackson@example.com'),
+        ('Richard', 'White', 49, 'richard.white@mail.com'),
+        ('Susan', 'Lee', 24, 'susan.lee@company.com'),
+        ('Joseph', 'Clark', 41, 'joseph.clark@business.org'),
+        ('Jessica', 'Walker', 29, 'jessica.walker@email.net')
+    `,
+>>>>>>> parent of 3133b13 (continuation lab 4 project)
         (err) => {
           if (err) {
             console.log(err.message);
           } else {
-            console.log("---> Rows inserted in the table ratparentsdata.");
+            console.log("---> Rows inserted in the table Person.");
           }
         }
       );
@@ -109,21 +139,12 @@ const { initTableratchildren } = require(__dirname + "/data/ratchildrendata");
   }
 );
 
-// two tables, one for parents and one for children of rats of course
-
-db.run(
-  `
-  CREATE TABLE ratchildrendata (
-    pid INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    age INTEGER,
-    parentid TEXT
-  )
-`,
-  (error) => {
-    if (error) {
-      console.log("---> ERROR:", error);
+app.get("/rawpersons", function (req, res) {
+  db.all("SELECT * FROM Person", [], (err, rawPersons) => {
+    if (err) {
+      console.log("Error: " + err);
     } else {
+<<<<<<< HEAD
       console.log("---> Table created!");
 
       db.run(
@@ -145,11 +166,13 @@ db.run(
           }
         }
       );
+=======
+      console.log("Data retrieved successfully");
+      res.send(rawPersons);
+>>>>>>> parent of 3133b13 (continuation lab 4 project)
     }
-  }
-);
-
-/*source: Code help from classmate, Kacper Paska, 4/6-2025*/
+  });
+});
 
 /*app.get("/listpersons", function (req, res) {
   db.all("SELECT * FROM Person", function (err, rawPersons) {
