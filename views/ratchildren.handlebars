@@ -1,14 +1,13 @@
- <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <link rel="stylesheet" href="/css/style-cv.css" />
-    <title>Document</title>
-  </head>
-  <body>
-    <header>
-        <h1>Rat Children</h1>
-        </header>
-    
 
-  </body>
-</html>
+    <header>
+        <h1>Listed Rat Children</h1>
+        </header>
+
+        <div>
+
+              {{#each listOfChildren}}
+                <li>{{this.name}} - {{this.age}} years old</li>
+            {{/each}}   
+        </ul>
+        </div>
+    

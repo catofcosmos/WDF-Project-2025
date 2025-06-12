@@ -1,220 +1,211 @@
+//Global definitions//
+const adminName = "RatAdmin";
+//const adminPassword = "Rat123";
+const adminPassword =
+  "$2b$12$Cis13IvUy2f9SBsF9MfoouLq2qbswu6RPEncl.NUr2HkEkeNI1SAK";
+
+/*packages*/
+
+const bcrypt = require("bcrypt");
+
+const saltRounds = 12; // Number of rounds for bcrypt hashing
+
+//bcrypt.hash(adminPassword, saltRounds, (err, hash) => {
+// if (err) {
+//   console.error("Error encrypting password:", err);
+// } else {
+//   console.log("Hashed password (GENERATE ONLY ONCE):", hash);
+// You can store this hash in your database or use it as needed
+// }
+//});
+
 const express = require("express");
-const fs = require("fs");
-const sqlite3 = require("sqlite3");
-
+const session = require("express-session"); // sessions in expr.
+const connectSqlite3 = require("connect-sqlite3"); // session store for sqlite3
+const SQLiteStore = connectSqlite3(session);
+const sqlite3 = require("sqlite3").verbose(); // Using verbose() for better error messages
 const port = 8080;
-
 const app = express();
 
-/*const ratparentsdata = [
-  { id: 1, name: "Rathew Chedders", age: 34, email: "R-Chedders@ratlook.com" },
-  { id: 2, name: "Ratticus Edamers", age: 29, email: "bitrat@ratlook.com" },
-  { id: 3, name: "Rathilda Gouda", age: 45, email: "R.Gouda@ratlook.com" },
-  { id: 4, name: "Rattin Brie", age: 38, email: "BrieBoy@ratlook.com" },
-  { id: 5, name: "Ratoline Camamberta", age: 50, email: "Rat.Cam@ratlook.com" },
-];
+// Middleware for session management, moved up from further down with help of chatgpt, 2025.6.12
+app.use(
+  session({
+    //define the session
+    store: new SQLiteStore({ db: "session-db.db" }),
+    saveUninitialized: false,
+    resave: false,
+    secret: "This#Is8a@Rat#Secret",
+  })
+);
+app.use(function (req, res, next) {
+  console.log("session passed to response locals....");
+  res.locals.session = req.session;
+  next();
+});
 
-const ratchildrendata = [
-  { id: 1, name: "Ratis Chedders", age: 5, parentid: "1" },
-  { id: 2, name: "Rathon Edamers", age: 3, parentid: "2" },
-  { id: 3, name: "Raters Gouda", age: 4, parentid: "3" },
-  { id: 4, name: "Ratty Brie", age: 3, parentid: "4" },
-  { id: 5, name: "Ratels Camamberta", age: 4, parentid: "5" },
-];
-*/
-/*app.use(express.static(__dirname + '/public'));*/
+/*Login*/
+app.use(express.urlencoded({ extended: true }));
+//const fs = require("fs");
+app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/views"));
 
+// Login POST handler
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    const model = { error: "Username and password are required.", message: "" };
+    return res.status(400).render("login.handlebars", model);
+  }
+  if (username == adminName) {
+    console.log("the user is a rat admin");
+    // if (password == adminPassword) {
+    // console.log("The password matches RatAdmin");
+    //model//
+    // const model = { error: "", message: "You are the Rat admin, welcome!" };
+
+    // res.render("login.handlebars", model);
+    //} else {
+    // const model = { error: "Incorrect password for RatAdmin.", message: "" };
+    // res.status(400).render("login.handlebars", model);
+    // }
+    bcrypt.compare(password, adminPassword, (err, result) => {
+      if (err) {
+        //build a model
+        const model = {
+          error: "Error while comparing passwords: " + err,
+          message: "",
+        };
+        return res.status(500).render("login.handlebars", model);
+      }
+      if (result) {
+        console.log("the password matches RatAdmin");
+        req.session.isAdmin = true;
+        req.session.isLoggedIn = true;
+        req.session.name = username;
+        console.log("Session information:" + JSON.stringify(req.session));
+        // Set session variable to indicate admin status
+        //do not go to login but /.
+        res.redirect("/");
+        //const model = { error: "", message: "You are the Rat admin, welcome!" };
+        //return res.render("login.handlebars", model);
+      } else {
+        const model = {
+          error: "Incorrect password for RatAdmin.",
+          message: "",
+        };
+        return res.status(400).render("login.handlebars", model);
+      }
+    });
+  } else {
+    const model = {
+      error: `Incorrect username, ${username} is not correct.`,
+      message: "",
+    };
+
+    res.render("login.handlebars", model);
+  }
+});
+
+// DATABASE
 const dbFile = "my-project-data.sqlite3.db";
-const db = new sqlite3.Database(dbFile);
-
-app.get("/", function (req, res) {
-  res.render("home");
-});
-/*HERE*/
-
-/*app.get("/home", function (req, res) {
-  res.render("home.handlebars");
-});*/
-
-app.get("/contact", function (req, res) {
-  res.render("contact.handlebars");
+const db = new sqlite3.Database(dbFile, (err) => {
+  if (err) {
+    console.error("Database connection error:", err.message);
+  } else {
+    console.log("Connected to the SQLite database.");
+  }
 });
 
-app.get("/ratparents", function (req, res) {
-  res.render("ratparents.handlebars");
-});
-
-app.get("/ratchildren", function (req, res) {
-  res.render("ratchildren.handlebars");
-  res.send("Hello filthy Rat!");
-});
-
-app.use(express.static("public"));
-
-app.listen(port, function () {
-  console.log(`server upp and running, listening to port ${port}`);
-});
-
-/*app.use(express.static("views"));*/
-
-app.get("/about", function (req, res) {
-  res.render("about.handlebars");
-});
-/* source Hannah jansson & Kacper Paska, 10/6-2025 */
+// Initialize tables after db connection is established
 const { initTableratparents } = require(__dirname + "/data/ratparentsdata");
 const { initTableratchildren } = require(__dirname + "/data/ratchildrendata");
 
-//initTableAuthors(db);
-//initTableMovies(db);
+initTableratparents(db);
+initTableratchildren(db);
 
-/*db.run(
-app.get("/cv", function (req, res) {
-  res.sendFile(__dirname + "/views/mycv-01.html");
-});
+// HANDLEBARS
+const { engine } = require("express-handlebars");
+const { error } = require("console");
 
-app.use(express.static("public"));
-app.use(express.static("views"));
-
-db.run(
-  `
-  CREATE TABLE Person (
-    pid INTEGER PRIMARY KEY,
-    fname TEXT NOT NULL,
-    lname TEXT NOT NULL,
-    age INTEGER,
-    email TEXT
-  )
-`,
-  (error) => {
-    if (error) {
-      console.log("---> ERROR:", error);
-    } else {
-      console.log("---> Table created!");
-
-      db.run(
-        `
-<<<<<<< HEAD
-      INSERT INTO ratparentsdata (pid,name, age, email)
-      VALUES 
-        ('1','Rathew Chedders','34', 'R-Chedders@ratlook.com'),
-        ('2', 'Ratticus Edamers', '29','bitrat@ratlook.com'),
-        ('3', 'Rathilda Gouda', '45', 'R.Gouda@ratlook.com'),
-        ('4', 'Rattin Brie', '38', 'BrieBoy@ratlook.com'),
-        ('5', 'Ratoline Camamberta', '50','Rat.Cam@ratlook.com')`,
-
-=======
-      INSERT INTO Person (fname, lname, age, email)
-      VALUES 
-        ('John', 'Smith', 25, 'john.smith@example.com'),
-        ('Jane', 'Doe', 30, 'jane.doe@mail.com'),
-        ('Alex', 'Johnson', 40, 'alex.johnson@company.com'),
-        ('Emily', 'Brown', 35, 'emily.brown@business.org'),
-        ('Michael', 'Davis', 50, 'michael.davis@email.net'),
-        ('Sarah', 'Miller', 28, 'sarah.miller@example.com'),
-        ('David', 'Garcia', 45, 'david.garcia@mail.com'),
-        ('Laura', 'Rodriguez', 32, 'laura.rodriguez@company.com'),
-        ('Chris', 'Wilson', 27, 'chris.wilson@business.org'),
-        ('Anna', 'Martinez', 22, 'anna.martinez@email.net'),
-        ('James', 'Taylor', 53, 'james.taylor@example.com'),
-        ('Patricia', 'Anderson', 44, 'patricia.anderson@mail.com'),
-        ('Robert', 'Thomas', 38, 'robert.thomas@company.com'),
-        ('Linda', 'Hernandez', 55, 'linda.hernandez@business.org'),
-        ('William', 'Moore', 26, 'william.moore@email.net'),
-        ('Barbara', 'Jackson', 37, 'barbara.jackson@example.com'),
-        ('Richard', 'White', 49, 'richard.white@mail.com'),
-        ('Susan', 'Lee', 24, 'susan.lee@company.com'),
-        ('Joseph', 'Clark', 41, 'joseph.clark@business.org'),
-        ('Jessica', 'Walker', 29, 'jessica.walker@email.net')
-    `,
->>>>>>> parent of 3133b13 (continuation lab 4 project)
-        (err) => {
-          if (err) {
-            console.log(err.message);
-          } else {
-            console.log("---> Rows inserted in the table Person.");
-          }
-        }
-      );
-    }
-  }
+app.engine(
+  "handlebars",
+  engine({
+    helpers: {
+      eq(a, b) {
+        return a == b;
+      },
+    },
+  })
 );
+app.set("view engine", "handlebars");
+app.set("views", __dirname + "/views");
 
-app.get("/rawpersons", function (req, res) {
-  db.all("SELECT * FROM Person", [], (err, rawPersons) => {
+// ROUTES
+
+app.get("/", function (req, res) {
+  // res.render("home");
+  const model = {
+    isLoggedIn: req.session.isLoggedIn,
+    name: req.session.name,
+    isAdmin: req.session.isAdmin,
+  };
+  console.log("--->Home model: " + JSON.stringify(model));
+  res.render("home.handlebars", model);
+});
+
+app.get("/home", function (req, res) {
+  res.render("home");
+});
+
+app.get("/contact", function (req, res) {
+  res.render("contact");
+});
+
+/*Login*/
+app.get("/login", function (req, res) {
+  res.render("login.handlebars");
+});
+
+/*logout*/
+app.get("/logout", function (req, res) {
+  req.session.destroy((err) => {
     if (err) {
-      console.log("Error: " + err);
+      console.log("Error while destroying session", err);
     } else {
-<<<<<<< HEAD
-      console.log("---> Table created!");
-
-      db.run(
-        `
-      INSERT INTO ratchildrendata (pid,name, age, parentid)
-      VALUES 
-        ('1', 'Ratis Chedders', '5', '1'),
-        ('2', 'Rathon Edamers','3','2'),
-        ('3','Raters Gouda','4','3'),
-        ('4','Ratty Brie', '3', '4' ),
-        ('5', 'Ratels Camamberta', '4', '5')
-        
-    `,
-        (err) => {
-          if (err) {
-            console.log(err.message);
-          } else {
-            console.log("---> Rows inserted in the table ratchildrendata.");
-          }
-        }
-      );
-=======
-      console.log("Data retrieved successfully");
-      res.send(rawPersons);
->>>>>>> parent of 3133b13 (continuation lab 4 project)
+      console.log("logged out");
+      res.redirect("/");
     }
   });
 });
 
-/*app.get("/listpersons", function (req, res) {
-  db.all("SELECT * FROM Person", function (err, rawPersons) {
+app.get("/ratparents", function (req, res) {
+  db.all("SELECT * FROM ratparentsdata", (err, ratparentsdata) => {
     if (err) {
-      console.log("Error: " + err);
-    } else {
-      listPersonsHTML = "<ul>";
-      rawPersons.forEach(function (onePerson) {
-        listPersonsHTML += `<li>
-            ${onePerson.fname} ${onePerson.lname}, Age: ${onePerson.age}, Email:
-            ${onePerson.email}
-          </li>`;
-      });
-      listPersonsHTML += "</ul>";
-      res.send(listPersonsHTML);
+      console.log("Error: ", err);
+      return res.status(500).send("Database error");
     }
-  });
-});
-/*source: Code help from classmate, Kacper Paska, 4/6-2025*/
-
-
-
-app.get("/ratparentsdata", function (req, res) {
-  db.all("SELECT * FROM ratparentsdata", (err, listOfParents) => {
-    if (err) {
-      console.log("Error: ", err); //error display in terminal
-    } else {
-      model = { ratparentsdata: listOfParents };
-      res.render("ratparents.handlebars", model); //model for handlebars
-    }
+    res.render("ratparents", {
+      listOfParents: ratparentsdata, // Make sure this matches your template
+    });
   });
 });
 
-const ratchildrendata = require(__dirname + "/data/ratchildrendata");
+app.get("/about", function (req, res) {
+  res.render("about");
+});
 
-app.get("/ratchildrendata", function (req, res) {
-  db.all("SELECT * FROM ratchildrendata", (err, listOfChildren) => {
+app.get("/ratchildren", function (req, res) {
+  db.all("SELECT * FROM ratchildrendata", (err, ratchildrendata) => {
     if (err) {
-      console.log("Error: ", err); //error display in terminal
-    } else {
-      model = { ratchildrendata: listOfChildren };
-      res.render("ratchildren.handlebars", model); //model for handlebars
+      console.log("Error: ", err);
+      return res.status(500).send("Database error");
     }
+    res.render("ratchildren", {
+      listOfChildren: ratchildrendata, // Make sure this matches your template
+    });
   });
+});
+
+app.listen(port, function () {
+  console.log(`Server up and running, listening to port ${port}`);
 });

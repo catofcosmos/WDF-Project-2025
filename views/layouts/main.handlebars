@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/style-cv.css" />
+    <link rel="stylesheet" href="/css/mystyles01.css" />
     <title>Document</title>
   </head>
   <body>
@@ -15,7 +15,17 @@
         <li><a href="/ratparents">Rat Parents</a></li>
         <li><a href="/ratchildren">Rat Children</a></li>
         <li><a href="/contact">Contact</a></li>
+
+        {{#if session.isLoggedIn}}
+          <li id="menulogin">Hi,
+            {{session.name}}
+            -
+            <a href="/logout">Logout</a></li>
+        {{else}}
+          <li id="menulogin"><a href="/login">Login</a></li>
+        {{/if}}
       </ul>
+
     </nav>
 
     {{{body}}}

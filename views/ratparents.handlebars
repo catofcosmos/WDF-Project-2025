@@ -1,22 +1,14 @@
- <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <link rel="stylesheet" href="/css/style-cv.css" />
-    <title>Document</title>
-  </head>
-  <body>
-    <header>
-        <h1>Rat Parents</h1>
-        </header>
-    <p>Rat Parents</p>
-    <div id="rat-parents-content">
-        <p>Welcome to the Rat Parents page!</p>
-        <ul>
-            {{#each ratParents}}
-                <li>{{this.name}} - {{this.age}} years old</li>
-            {{/each}}   
-        </ul>
-        </div>
+<header>
+  <h1>Rat Parents</h1>
+</header>
+<p>Rat Parents</p>
+<div>
+  <p>Welcome to the Rat Parents page!</p>
+  <p>Here you can find information about rat parenting, care tips, and more.</p>
 
-  </body>
-</html>
+  <ul>
+    {{#each listOfParents}}
+      <li>{{this.name}} - {{this.age}} years old</li>
+    {{/each}}
+  </ul>
+</div>

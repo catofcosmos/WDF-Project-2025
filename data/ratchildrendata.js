@@ -1,5 +1,3 @@
-//Code provided by Hannah Janson
-
 const ratchildrendata = [
   {
     pid: 1,
@@ -33,48 +31,41 @@ const ratchildrendata = [
   },
 ];
 
-module.exports = ratchildren;
-
-// Adapted from Hannah Janson's code
-
-function ratchildren(db) {
+function initTableratchildren(db) {
   db.run(
-    `CREATE TABLE IF NOT EXISTS ratchildren (
-			pid INTEGER PRIMARY KEY,
-			cid INTEGER,
-			name TEXT NOT NULL,
-			age TEXT NOT NULL,
-	
-			FOREIGN KEY (cid) REFERENCES authors(cid)
-		)`,
+    `CREATE TABLE IF NOT EXISTS ratchildrendata (
+      pid INTEGER,
+      cid INTEGER PRIMARY KEY,
+      name TEXT NOT NULL,
+      age TEXT NOT NULL,
+      FOREIGN KEY (pid) REFERENCES ratparentsdata(pid)
+    )`,
     (error) => {
       if (error) {
-        console.log("Error creating ratchildren table:", error);
+        console.log("Error creating ratchildrendata table:", error);
       } else {
-        console.log("---> ratchildren table created!");
+        console.log("---> ratchildrendata table created!");
 
-        ratchildren.forEach((ratchildren) => {
-          db.run(
-            `INSERT INTO ratchildren (pid, cid, name, age,)
-						VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [
-              ratchildren.cid,
-              ratchildren.pid,
-              ratchildren.name,
-              ratchildren.age,
-            ],
-            (err) => {
-              if (err) {
-                console.log("Insert error (ratchildren):", err);
-              } else {
-                console.log("---> ratchildren inserted.");
+        // Clear existing data to avoid duplicates
+        db.run("DELETE FROM ratchildrendata", () => {
+          // Insert all sample data
+          ratchildrendata.forEach((child) => {
+            db.run(
+              `INSERT INTO ratchildrendata (pid, cid, name, age)
+              VALUES (?, ?, ?, ?)`,
+              [child.pid, child.cid, child.name, child.age],
+              (err) => {
+                if (err) {
+                  console.log("Insert error (ratchildrendata):", err);
+                }
               }
-            }
-          );
+            );
+          });
+          console.log("---> ratchildren data inserted.");
         });
       }
     }
   );
 }
 
-module.exports = { ratchildren, initTableRatchildren };
+module.exports = { initTableratchildren };
