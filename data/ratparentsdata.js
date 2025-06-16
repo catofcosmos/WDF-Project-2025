@@ -5,7 +5,7 @@ const ratparentsdata = [
   { pid: 4, name: "Brie Briers", age: "8" },
   { pid: 5, name: "Camembert Caretaker", age: "16" },
 ];
-
+/* help from chat gpt so that the table updates with the sqlite3 browser inserts 16/6 2025 https://chatgpt.com/share/68502851-ee04-8013-a2a9-6578984035d7*/
 function initTableratparents(db) {
   db.run(
     `CREATE TABLE IF NOT EXISTS ratparentsdata (
