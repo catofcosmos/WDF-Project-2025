@@ -3,10 +3,23 @@
         <h1>Listed Rat Children</h1>
         </header>
 
-        <div>
+        {{#if session.isAdmin}}
+        <div><a href="/ratchild/new"> Enlist child </a> </div>
+        {{/if}}
 
+        <div>
+            <ul>
               {{#each listOfChildren}}
-                <li>{{this.name}} - {{this.age}} years old</li>
+                <li>
+                  <a href="/ratchild/{{this.cid}}">{{this.name}}</a> - {{this.age}} years old
+                  Description: {{this.description}}<br/>
+                    {{#if ../session.isAdmin}}
+                    <a href="/ratchild/modify/{{this.cid}}" class="modify">Modify</a>
+                   <a href="/ratchild/delete/{{this.cid}}" class="delete">Delete</a>
+                
+                        </li>
+                   {{/if}}
+                    
             {{/each}}   
         </ul>
         </div>

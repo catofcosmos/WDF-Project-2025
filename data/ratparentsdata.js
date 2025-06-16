@@ -1,29 +1,9 @@
 const ratparentsdata = [
-  {
-    pid: 1,
-    name: "Cheesy Parent",
-    age: "12",
-  },
-  {
-    pid: 2,
-    name: "Edam Elder",
-    age: "14",
-  },
-  {
-    pid: 3,
-    name: "Gouda Guardian",
-    age: "10",
-  },
-  {
-    pid: 4,
-    name: "Brie Breeder",
-    age: "8",
-  },
-  {
-    pid: 5,
-    name: "Camembert Caretaker",
-    age: "16",
-  },
+  { pid: 1, name: "Cheesy Parent", age: "30" },
+  { pid: 2, name: "Edam Elder", age: "45" },
+  { pid: 3, name: "Gouda Guardian", age: "10" },
+  { pid: 4, name: "Brie Briers", age: "8" },
+  { pid: 5, name: "Camembert Caretaker", age: "16" },
 ];
 
 function initTableratparents(db) {
@@ -37,24 +17,26 @@ function initTableratparents(db) {
       if (error) {
         console.log("Error creating ratparentsdata table:", error);
       } else {
-        console.log("---> ratparentsdata table created!");
+        console.log("---> ratparentsdata table created or already exists!");
 
-        // Clear existing data to avoid duplicates
-        db.run("DELETE FROM ratparentsdata", () => {
-          // Insert all sample data
-          ratparentsdata.forEach((parent) => {
-            db.run(
-              `INSERT INTO ratparentsdata (pid, name, age)
-              VALUES (?, ?, ?)`,
-              [parent.pid, parent.name, parent.age],
-              (err) => {
-                if (err) {
-                  console.log("Insert error (ratparentsdata):", err);
-                }
-              }
+        // Check if the table is empty
+        db.get("SELECT COUNT(*) AS count FROM ratparentsdata", (err, row) => {
+          if (err) {
+            console.log("Error counting ratparentsdata rows:", err);
+          } else if (row.count === 0) {
+            // Insert default data only if table is empty
+            const insert = db.prepare(
+              `INSERT INTO ratparentsdata (pid, name, age) VALUES (?, ?, ?)`
             );
-          });
-          console.log("---> ratparents data inserted.");
+            ratparentsdata.forEach((parent) => {
+              insert.run(parent.pid, parent.name, parent.age);
+            });
+            insert.finalize(() => {
+              console.log("---> ratparents default data inserted.");
+            });
+          } else {
+            console.log("---> ratparentsdata table already has data, skipping insert.");
+          }
         });
       }
     }
