@@ -1,14 +1,19 @@
 <header>
-  <h1>Rat Parents</h1>
+  <h1 class="Listed">Rat Parents</h1>
 </header>
-<p>Rat Parents</p>
+
 <div>
   <p>Welcome to the Rat Parents page!</p>
-  <p>Here you can find information about rat parenting, care tips, and more.</p>
-
-  <ul>
+  <p>Here you can find the parents who have children listed at this Daycare</p>
+  </div>  
+<div class="rat-parents-list">
+  <ul class="parent-list">
+    {{#if session.isAdmin}}
+     
+    {{/if}}
     {{#each listOfParents}}
       <li>{{this.name}} - {{this.age}} years old</li>
     {{/each}}
   </ul>
+  </div>
 </div>

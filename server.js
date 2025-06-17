@@ -197,10 +197,8 @@ app.get("/ratparents", function (req, res) {
   });
 });
 
-
-
-//rat children content 
-app.get('/ratchildren', function (req, res) {
+//rat children content
+app.get("/ratchildren", function (req, res) {
   db.all("SELECT * FROM ratchildrendata", (err, ratchildrendata) => {
     if (err) {
       console.log("Error: ", err);
@@ -212,116 +210,201 @@ app.get('/ratchildren', function (req, res) {
   });
 });
 
-
 //add new child / enlist new child
-app.get('/ratchild/new', function (req,res) {
-  res.render('new-ratchild');
-})
-
-//Modify existing child info
-app.get('/ratchild/modify/:cid', function (req, res) {
-  const id = req.params.cid;
-  db.get("SELECT * FROM ratchildrendata WHERE cid=?", [id], (error, theChild) => {
-    if (error) {
-      console.log("ERROR: ", error);
-      res.redirect('/ratchildren');
-    } else {
-      const model = { child: theChild };
-      res.render('new-ratchild.handlebars', model);
+app.get("/ratchild/new", function (req, res) {
+  db.all("SELECT pid, name FROM ratparentsdata", (err, parents) => {
+    if (err) {
+      return res.status(500).send("Database error");
     }
+    res.render("new-ratchild", { parents });
   });
 });
 
-app.post('/ratchild/modify/:cid', function (req, res) {
+//Modify existing child info
+app.get("/ratchild/modify/:cid", function (req, res) {
+  const id = req.params.cid;
+
+  db.get(
+    "SELECT * FROM ratchildrendata WHERE cid=?",
+    [id],
+    (error, theChild) => {
+      if (error) {
+        console.log("ERROR: ", error);
+        return res.redirect("/ratchildren");
+      }
+
+      db.all("SELECT pid, name FROM ratparentsdata", (err, parents) => {
+        if (err) {
+          console.log("ERROR fetching parents: ", err);
+          return res.redirect("/ratchildren");
+        }
+
+        const model = {
+          child: theChild,
+          parents: parents,
+        };
+
+        console.log("Modify model:", model); // <- Add this to verify output
+        res.render("new-ratchild.handlebars", model);
+      });
+    }
+  );
+});
+
+app.post("/ratchild/modify/:cid", function (req, res) {
+  const pid = req.body.pid || null;
   const cid = req.params.cid;
   const name = req.body.childname;
   const year = req.body.childyear;
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - parseInt(year);
   const desc = req.body.childdesc;
   const type = req.body.actiontype;
   const url = req.body.URLfile || null;
 
   db.run(
-    "UPDATE ratchildren SET name = ?, age = ?, description = ?, action = ?, cimgURL = ? WHERE cid = ?",
-    [name, year, desc, type, url, cid],
+    "UPDATE ratchildrendata SET pid = ?, name = ?, age = ?, description = ?, action = ?, cimgURL = ? WHERE cid = ?",
+    [pid, name, age, desc, type, url, cid],
     function (error) {
       if (error) {
         console.log("ERROR: ", error);
-        res.redirect('/ratchildren');
+        res.redirect("/ratchildren");
       } else {
         console.log("Child successfully modified!");
-        res.redirect('/ratchildren');
+        res.redirect("/ratchildren");
       }
     }
   );
 });
 
+/*app.get("/ratchild/:cid", function (req, res) {
+  console.log(
+    "ratchildren route parameter cid: " + JSON.stringify(req.params.cid)
+  );
 
+  db.get(
+    "SELECT * FROM ratchildrendata WHERE cid=?",
+    [req.params.cid],
+    (error, ratchildrendata) => {
+      if (error) {
+        console.log("ERROR: ", error);
+        return res.status(500).send("database error");
+      } else {
+        const model = {
+          child: ratchildrendata,
+        };
+        res.render("ratchild.handlebars", model);
+      }
+    }
+  );
+});*/
 
+app.get("/ratchild/:cid", (req, res) => {
+  const childId = req.params.cid;
+  const sql = `
+    SELECT c.*, p.name AS parentName
+    FROM ratchildrendata c
+    LEFT JOIN ratparentsdata p ON c.pid = p.pid
+    WHERE c.cid = ?`;
 
-app.get('/ratchild/:cid', function (req,res){
-    console.log("ratchildren route parameter cid: "+JSON.stringify(req.params.cid))
-
-    db.get("SELECT * FROM ratchildrendata WHERE cid=?", [req.params.cid],(error, ratchildrendata) => {
-        if (error) {
-            console.log("ERROR: ", error);
-            return res.status(500).send("database error");
-
-
-        } else {
-            const model={
-                child: ratchildrendata
-            }
-            res.render('ratchild.handlebars', model);
-        }
-    });
+  db.get(sql, [childId], (err, child) => {
+    if (err) {
+      return res.status(500).send("Database error");
+    }
+    if (!child) {
+      return res.status(404).send("Child not found");
+    }
+    res.render("ratchild.handlebars", { child });
+  });
 });
 
-app.post('/ratchild/new', function (req,res) {
+app.get("/ratparents/:pid", (req, res) => {
+  const parentId = req.params.pid;
+
+  const sql = `
+    SELECT * FROM ratparentsdata
+    WHERE pid = ?`;
+
+  db.get(sql, [parentId], (err, parent) => {
+    if (err) return res.status(500).send("Database error");
+    if (!parent) return res.status(404).send("Parent not found");
+
+    // Optional: Get all children for this parent
+    const childrenSql = `
+      SELECT * FROM ratchildrendata
+      WHERE pid = ?`;
+
+    db.all(childrenSql, [parentId], (err, children) => {
+      if (err) return res.status(500).send("Database error");
+
+      res.render("ratparent", {
+        parent,
+        children,
+      });
+    });
+  });
+});
+
+app.post("/ratchild/new", function (req, res) {
   const name = req.body.childname;
   const year = req.body.childyear;
+  //added so that year displayes the age not the year theyre born with help f chatgpt 17-6-2025
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - parseInt(year);
   const desc = req.body.childdesc;
   const type = req.body.actiontype;
   const url = req.body.URLfile || null;
+  const pid = req.body.pid || null;
+  console.log("Trying to insert:", pid, name, age, desc, type, url);
 
-console.log("Trying to insert:", name, year, desc, type, url);
-
-  db.run("INSERT INTO ratchildrendata (name, age, description, action, cimgURL) VALUES (?, ?, ?, ?, ?)", 
-    [name, year, desc, type, url], (error) => {
+  db.run(
+    "INSERT INTO ratchildrendata (pid, name, age, description, action, cimgURL) VALUES (?, ?, ?, ?, ?, ?)",
+    [pid, name, age, desc, type, url],
+    (error) => {
       if (error) {
-        console.log("ERROR: ", error)
-        res.redirect('/ratchildren')
-
+        console.log("ERROR: ", error);
+        res.redirect("/ratchildren");
       } else {
-          console.log("child added to the list!")
-          res.redirect("/ratchildren")
+        console.log("child added to the list!");
+        res.redirect("/ratchildren");
       }
     }
-  )
-})
+  );
+});
 
-//delete rat children :C 
-app.get('/ratchild/delete/:cid', function (req,res){
-  console.log("rat child route parameter childid:"+JSON.stringify(req.params.cid));
+//delete rat children :C
+app.get("/ratchild/delete/:cid", function (req, res) {
+  console.log(
+    "rat child route parameter childid:" + JSON.stringify(req.params.cid)
+  );
   //delete in the table choosen ratchild with matching ID
-  db.run("DELETE FROM ratchildrendata WHERE cid=?", [req.params.cid], (error, child) => {
-    if (error) {
-      console.log("ERROR: ", error); //error display terminal
-
-    } else {
-      console.log("the child" +req.params.cid+ "has been deleted.");
-      //redirect to ratchildren route
-      res.redirect("/ratchildren");
+  db.run(
+    "DELETE FROM ratchildrendata WHERE cid=?",
+    [req.params.cid],
+    (error, child) => {
+      if (error) {
+        console.log("ERROR: ", error); //error display terminal
+      } else {
+        console.log("the child" + req.params.cid + "has been deleted.");
+        //redirect to ratchildren route
+        res.redirect("/ratchildren");
+      }
     }
-  })
-})
+  );
+});
 
+//--------------------
+//404 NOT FOUND
+//--------------------
 
+app.use(function (req, res) {
+  console.log("404 NOT FOUND");
+  res.status(404).render("404.handlebars");
+});
 
 app.listen(port, function () {
   console.log(`Server up and running, listening to port ${port}`);
 });
-
-
 
 /*
 app.get('/project/modify/:projid', function (req.res) {

@@ -1,26 +1,28 @@
+<header class="child-header">
+  <h1 class="Listed">Listed Rat Children</h1>
+</header>
 
-    <header>
-        <h1>Listed Rat Children</h1>
-        </header>
+{{#if session.isAdmin}}
+  <div class="add-child-link">
+    <a href="/ratchild/new" class="btn-enlist">+ Enlist Child</a>
+  </div>
+{{/if}}
 
-        {{#if session.isAdmin}}
-        <div><a href="/ratchild/new"> Enlist child </a> </div>
-        {{/if}}
+<div class="child-list">
+  {{#each listOfChildren}}
+    <div class="child-card">
+      <div class="child-info">
+        <a href="/ratchild/{{this.cid}}" class="child-name">{{this.name}}</a>
+        <span class="child-age"> - {{this.age}} years old</span>
+        <p class="child-desc">Description: {{this.description}}</p>
+      </div>
 
-        <div>
-            <ul>
-              {{#each listOfChildren}}
-                <li>
-                  <a href="/ratchild/{{this.cid}}">{{this.name}}</a> - {{this.age}} years old
-                  Description: {{this.description}}<br/>
-                    {{#if ../session.isAdmin}}
-                    <a href="/ratchild/modify/{{this.cid}}" class="modify">Modify</a>
-                   <a href="/ratchild/delete/{{this.cid}}" class="delete">Delete</a>
-                
-                        </li>
-                   {{/if}}
-                    
-            {{/each}}   
-        </ul>
+      {{#if ../session.isAdmin}}
+        <div class="child-buttons">
+          <a href="/ratchild/modify/{{this.cid}}" class="btn-modify">Modify</a>
+          <a href="/ratchild/delete/{{this.cid}}" class="btn-delete">Delete</a>
         </div>
-    
+      {{/if}}
+    </div>
+  {{/each}}
+</div>

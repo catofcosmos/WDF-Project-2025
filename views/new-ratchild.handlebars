@@ -4,17 +4,29 @@
   <h1>Enlist child</h1> 
 {{/if}}
 
-<div class="text">
+<div class="modifybox">
   <form action="{{#if child.cid}}/ratchild/modify/{{child.cid}}{{else}}/ratchild/new{{/if}}" method="POST">
-
+<div class="form-box">
     <label for="childname">Name of child</label>
     <input type="text" id="childname" name="childname" required="required" value="{{child.name}}"><br/>
-
+</div>
+<div class="form-box">
     <label for="childyear">Year</label>
     <input type="number" id="childyear" name="childyear" min="2010" max="2050" required="required" value="{{child.age}}"><br/>
-
+</div>
+<div class="form-box">
     <label for="childdesc">Description:</label>
     <textarea id="childdesc" name="childdesc" required="required">{{child.description}}</textarea><br/>
+</div>
+
+    <label for="parent">Select Parent:</label>
+  <select name="pid" id="pid" required>
+  <option value="">-- Select a Parent --</option>
+  {{#each parents}}
+    <option value="{{this.pid}}" {{#if (eq this.pid ../child.pid)}}selected{{/if}}>{{this.name}}</option>
+  {{/each}}
+</select>
+<br/>
 
     <label for="actiontype">Action</label>
     <select name="actiontype" id="actiontype">
@@ -26,7 +38,7 @@
     <label for="URLfile">URL:</label>
     <input type="text" id="URLfile" name="URLfile" placeholder="/img/something.png" value="{{child.cimgURL}}"><br/>
 
-    <input type="submit" value="{{#if child.cid}}Update Child{{else}}Create New Child{{/if}}" />
+    <input type="submit" class="Updatechildbutton" value="{{#if child.cid}}Update Child{{else}}Create New Child{{/if}}" />
 
   </form>
 </div>

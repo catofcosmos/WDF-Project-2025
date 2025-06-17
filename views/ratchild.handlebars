@@ -1,17 +1,20 @@
-<div>
-    <h1> Child </h1>
+<h2 class="Listed">{{child.name}}</h2>
+<p>Age: {{child.age}}</p>
+<p>Description: {{child.description}}</p>
+<p>Action: {{child.action}}</p>
 
-    <div class="ratchildtextcard">
+  <p>Child ID: {{child.cid}}</p>
+  <p>Parent ID: {{child.pid}}</p>
+<div class="ratimg">
 
-        <div class="ratchildinfo">
-
-            <h2>{{child.name}}</h2> 
-            <p>Age: {{child.age}} years old</p>
-            <p>Child ID: {{child.cid}}</p>
-            <p>Parent ID {{child.pid}}</p>
-        </div>
-        <div class="ratimage">
-            <img src="{{child.cimgURL}}" alt="{{child.cimgURL}}" class="childimage" />
-        </div>
-    </div>
+<img src="/images/{{child.cimgURL}}" alt="{{child.name}}" width="300  />
 </div>
+{{#if child.parentName}}
+  <h3 class="P">Parent Info</h3>
+  <p>
+    Parent:
+    <a href="/ratparents/{{child.pid}}">{{child.parentName}}</a>
+  </p>
+{{else}}
+  <p>No parent info available</p>
+{{/if}}

@@ -1,0 +1,22 @@
+<h2 class="Listed">{{parent.name}}</h2>
+
+<p><strong>PID:</strong> {{parent.pid}}</p>
+
+<h3 class="Listed03">Children</h3>
+{{#if children.length}}
+  <div class="rat-parents-list02">
+    <ul class="parent-list02">
+      {{#if session.isAdmin}}{{/if}}
+      {{#each children}}
+        <li>
+          <a href="/ratchild/{{this.cid}}">{{this.name}}</a>
+          - Age:
+          {{this.age}}
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+
+{{else}}
+  <p>This parent has no children listed.</p>
+{{/if}}

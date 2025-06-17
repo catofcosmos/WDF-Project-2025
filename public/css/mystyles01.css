@@ -1,0 +1,234 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #c8d8e8;
+  color: #333;
+  padding: 20px;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  background: #7d9fec;
+  padding: 10px;
+}
+
+nav li {
+  margin: 0 10px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+h2,
+h3 {
+  color: #5b3a29;
+}
+
+a {
+  color: #333;
+}
+
+.ratpicture {
+  width: 400px;
+  height: auto;
+  margin: auto;
+  display: block;
+}
+
+/* Layout */
+.child-list {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.rat-parents-list {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.parent-list {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.rat-parents-list02 {
+  max-width: 700px;
+  margin: 0 auto;
+  margin-top: 0;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.parent-list02 {
+  max-width: 700px;
+  margin: 0 auto;
+  margin-top: 0rem;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.child-card {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.child-info {
+  margin-bottom: 0.5rem;
+}
+
+.child-name {
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+.child-name:hover {
+  text-decoration: underline;
+}
+
+.child-desc {
+  margin: 0.5rem 0 0;
+}
+
+/* Buttons */
+.add-child-link {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-enlist {
+  padding: 0.5rem 1rem;
+  background-color: #737fe9;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-enlist:hover {
+  background-color: #57d773;
+}
+
+.child-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-modify,
+.btn-delete {
+  padding: 0.3rem 0.8rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-modify {
+  background-color: #75aeea;
+  color: white;
+}
+
+.btn-modify:hover {
+  background-color: #0056b3;
+}
+
+.btn-delete {
+  background-color: #ee33bf;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+.Listed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+.Listed03 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 5px 0;
+  margin-bottom: 0;
+}
+p {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.P {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ratimg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.modifybox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: auto;
+}
+
+.Updatechildbutton {
+  padding: 0.5rem 1rem;
+  background-color: #7782e7;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-top: 1rem;
+}
+.Updatechildbutton:hover {
+  background-color: #4722b6;
+}
+
+.modifybox .formbox {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.modifybox label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-align: left;
+}
+.modifybox input,
+.modifybox select,
+.modifybox textarea {
+  padding: 8px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}

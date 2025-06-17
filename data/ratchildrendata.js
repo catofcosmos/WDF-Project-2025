@@ -69,14 +69,24 @@ function initTableratchildren(db) {
           if (err) {
             console.log("Error counting ratchildrendata rows:", err);
           } else if (row.count > 0) {
-            console.log("---> ratchildrendata table already has data, skipping insert.");
+            console.log(
+              "---> ratchildrendata table already has data, skipping insert."
+            );
           } else {
             // Insert all sample data
             ratchildrendata.forEach((child) => {
               db.run(
                 `INSERT INTO ratchildrendata (pid, cid, name, age, description, action, cimgURL)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [child.pid, child.cid, child.name, child.age, child.description, childaction, child.cimgURL],
+                [
+                  child.pid,
+                  child.cid,
+                  child.name,
+                  child.age,
+                  child.description,
+                  child.action,
+                  child.cimgURL,
+                ],
                 (err) => {
                   if (err) {
                     console.log("Insert error (ratchildrendata):", err);
